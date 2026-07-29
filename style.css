@@ -1,11 +1,3 @@
-/*
-
-TemplateMo 593 personal shape
-
-https://templatemo.com/tm-593-personal-shape
-
-*/
-
 @charset "utf-8";
 /* CSS Document */
 
@@ -194,6 +186,14 @@ https://templatemo.com/tm-593-personal-shape
             background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
+        }
+
+        .gradient-text {
+            background: var(--gradient-elegant);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
         }
 
         .nav-links {
@@ -778,7 +778,7 @@ https://templatemo.com/tm-593-personal-shape
         }
 
         .portfolio-item:nth-child(2) .portfolio-image {
-            background-image: url('images/computer-desk-stickers.jpg');
+            background-image: url('images/HiddenWithin.jpg');
         }
 
         .portfolio-item:nth-child(3) .portfolio-image {
@@ -828,6 +828,25 @@ https://templatemo.com/tm-593-personal-shape
             color: var(--text-secondary);
             margin-bottom: 1.5rem;
             line-height: 1.7;
+        }
+
+        .portfolio-action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+            padding: 0.9rem 1.5rem;
+            background: var(--gradient-primary);
+            color: #fff;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .portfolio-action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(99, 102, 241, 0.25);
         }
 
         .portfolio-tech {
