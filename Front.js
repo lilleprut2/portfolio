@@ -137,10 +137,14 @@ https://templatemo.com/tm-593-personal-shape
 
         // Enhanced parallax effect for hero background
         let ticking = false;
+        const hero = document.querySelector('.hero');
         
         function updateParallax() {
+            if (!hero) {
+                ticking = false;
+                return;
+            }
             const scrolled = window.pageYOffset;
-            const hero = document.querySelector('.hero');
             const rate = scrolled * -0.3;
             hero.style.transform = `translateY(${rate}px)`;
             ticking = false;
@@ -172,3 +176,98 @@ https://templatemo.com/tm-593-personal-shape
                 document.body.style.overflow = 'auto';
             }
         });
+
+        // Certificate hover manager: debounce show/hide to avoid choppy transitions
+        (() => {
+            const hideTimers = new WeakMap();
+            const overlayListeners = new WeakMap();
+            const HIDE_DELAY = 180; // ms
+
+            function attachHandlers() {
+                const cards = document.querySelectorAll('.cert-card');
+                if (!cards || cards.length === 0) return;
+
+                cards.forEach(card => {
+                    if (card.dataset.hoverAttached) return;
+                    card.dataset.hoverAttached = '1';
+                    const hover = card.querySelector('.cert-hover');
+
+                        card.addEventListener('mouseenter', () => {
+                        const t = hideTimers.get(card);
+                        if (t) { clearTimeout(t); hideTimers.delete(card); }
+                        card.classList.add('is-expanded');
+                        // move overlay out of document flow so it doesn't force section scrolling
+                        if (hover) attachFixedOverlay(card, hover);
+                    });
+
+                    card.addEventListener('mouseleave', () => {
+                        const timer = setTimeout(() => {
+                            card.classList.remove('is-expanded');
+                            detachFixedOverlay(card, hover);
+                            hideTimers.delete(card);
+                        }, HIDE_DELAY);
+                        hideTimers.set(card, timer);
+                    });
+
+                    // keyboard accessibility
+                    card.addEventListener('focusin', () => {
+                        const t = hideTimers.get(card);
+                        if (t) { clearTimeout(t); hideTimers.delete(card); }
+                        card.classList.add('is-expanded');
+                        if (hover) attachFixedOverlay(card, hover);
+                    });
+                    card.addEventListener('focusout', () => {
+                        const timer = setTimeout(() => { card.classList.remove('is-expanded'); detachFixedOverlay(card, hover); hideTimers.delete(card); }, HIDE_DELAY);
+                        hideTimers.set(card, timer);
+                    });
+                });
+            }
+
+            // Helpers to position overlay fixed over the viewport so it doesn't expand the section
+            function positionOverlay(card, hover) {
+                const rect = card.getBoundingClientRect();
+                // calculate a slightly larger overlay width so text has room (same as Campfire)
+                const padding = 16;
+                const viewportW = window.innerWidth - padding * 2;
+                const desiredWidth = Math.min(420, viewportW);
+                // align the overlay's left edge with the card so it reads as an expansion
+                let left = rect.left;
+                left = Math.max(padding, Math.min(left, window.innerWidth - desiredWidth - padding));
+                const top = Math.max(8, rect.top);
+                hover.style.position = 'fixed';
+                hover.style.left = left + 'px';
+                hover.style.top = top + 'px';
+                hover.style.width = desiredWidth + 'px';
+                hover.style.zIndex = 9999;
+            }
+
+            function attachFixedOverlay(card, hover) {
+                if (!hover) return;
+                // if already attached, update position
+                positionOverlay(card, hover);
+                const onUpdate = () => positionOverlay(card, hover);
+                window.addEventListener('resize', onUpdate);
+                window.addEventListener('scroll', onUpdate, { passive: true });
+                overlayListeners.set(card, onUpdate);
+            }
+
+            function detachFixedOverlay(card, hover) {
+                if (!hover) return;
+                const l = overlayListeners.get(card);
+                if (l) {
+                    window.removeEventListener('resize', l);
+                    window.removeEventListener('scroll', l, { passive: true });
+                    overlayListeners.delete(card);
+                }
+                // restore to absolute so stylesheet rules apply when not expanded
+                hover.style.position = '';
+                hover.style.left = '';
+                hover.style.top = '';
+                hover.style.width = '';
+                hover.style.zIndex = '';
+            }
+
+            // Attach immediately and also when DOM is ready (covers timing edge cases)
+            attachHandlers();
+            document.addEventListener('DOMContentLoaded', attachHandlers);
+        })();

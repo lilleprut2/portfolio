@@ -398,6 +398,7 @@
             height: 60px;
             top: 30%;
             right: 25%;
+        }
 
         /* Erfaring (Experience) section */
         .erfaring {
@@ -410,38 +411,93 @@
             margin-top: 0.5rem;
             margin-bottom: 1.5rem;
             font-size: 0.98rem;
+            text-align: center;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .erfaring-list {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.25rem;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+            padding-bottom: 0.5rem;
         }
 
         .erfaring-item {
             display: flex;
-            gap: 1.5rem;
-            align-items: flex-start;
+            justify-content: center;
+            align-items: center;
             background: var(--bg-card);
             padding: 1.25rem;
             border-radius: 12px;
             box-shadow: var(--shadow-sm);
             border: 1px solid rgba(15,23,42,0.03);
+            min-height: 170px;
         }
 
-        .erfaring-left {
-            min-width: 220px;
+        .company-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            text-align: center;
+            width: 100%;
         }
 
-        .erfaring-left .role {
-            font-size: 1.05rem;
-            margin-bottom: 0.25rem;
+        .company-logo {
+            width: 88px;
+            height: 88px;
+            aspect-ratio: 1 / 1;
+            object-fit: contain;
+            display: block;
+            border-radius: 18px;
+            background: #ffffff;
+            padding: 0.45rem;
+            box-shadow: var(--shadow-sm);
+            margin: 0 auto;
+        }
+
+        .company-block .company-name,
+        .company-block .company-dates {
+            margin: 0;
+            max-width: 190px;
+            word-break: break-word;
+        }
+
+        .erfaring-card-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.35rem;
+            width: 100%;
+        }
+
+        .erfaring-card-content .role {
+            margin: 0;
+            font-size: 1rem;
             color: var(--text-primary);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(15,23,42,0.08);
+            width: 100%;
+        }
+
+        .company-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.98rem;
+        }
+
+        .company-dates {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
         }
 
         .erfaring-left .company {
             color: var(--text-secondary);
             font-size: 0.95rem;
+            margin: 0;
         }
 
         .erfaring-right p {
@@ -455,25 +511,213 @@
         }
 
         @media (min-width: 768px) {
-            .erfaring-list {
-                grid-template-columns: 1fr;
-            }
-
             .erfaring-item {
                 padding: 1.5rem;
             }
         }
 
-        @media (max-width: 640px) {
-            .erfaring-item {
-                flex-direction: column;
-            }
-            .erfaring-left {
-                min-width: auto;
+        @media (max-width: 980px) {
+            .erfaring-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
-            background: rgba(255, 255, 255, 0.12);
-            animation: floatShape3 18s ease-in-out infinite;
+
+        @media (max-width: 640px) {
+            .erfaring-list {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding-bottom: 0.75rem;
+            }
+            .erfaring-item {
+                flex: 0 0 240px;
+            }
+        }
+
+        /* Certifications styling inside Erfaring */
+        .certifications {
+            margin-top: 2rem;
+            background: transparent;
+        }
+
+        .certifications h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .cert-row {
+            display: flex;
+            flex-direction: row !important;
+            gap: 1rem;
+            overflow-x: auto;
+            overflow-y: visible;
+            padding-bottom: 0.5rem;
+            -webkit-overflow-scrolling: touch;
+            flex-wrap: nowrap;
+            align-items: flex-start;
+            white-space: nowrap;
+        }
+
+        .cert-card {
+            position: relative;
+            flex: 0 0 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            background: var(--bg-card);
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(15,23,42,0.03);
+            text-align: center;
+            overflow: visible;
+            transition: box-shadow 0.25s ease, border-color 0.25s ease, height 0.35s ease, padding 0.25s ease;
+            cursor: pointer;
+            transform-origin: center center;
+            min-height: 220px; /* reserve base space so card doesn't collapse */
+        }
+
+        .cert-card.is-expanded {
+            /* keep the card in place — no layout-shifting transform/height */
+            transform: none;
+            box-shadow: 0 28px 60px rgba(0, 0, 0, 0.18);
+            border-color: rgba(15,23,42,0.12);
+            z-index: 40; /* ensure overlay is above everything */
+        }
+
+        .cert-image {
+            width: 100%;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Make the expanded view an absolute overlay to avoid layout shifts */
+        .cert-card {
+            position: relative; /* ensure overlay sits on top */
+        }
+
+        .cert-hover {
+            position: absolute;
+            inset: 0;
+            margin: 0;
+            background: rgba(15, 23, 42, 0.98);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            opacity: 0;
+            transform: translateY(12px) scale(0.995);
+            transition: opacity 420ms cubic-bezier(.2,.9,.2,1), transform 420ms cubic-bezier(.2,.9,.2,1);
+            transition-delay: 80ms; /* small delay before hiding to avoid flicker */
+            pointer-events: none;
+            /* remove heavy blur so overlay reads as part of the card */
+            backdrop-filter: none;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            box-shadow: 0 24px 50px rgba(0,0,0,0.18);
+            box-sizing: border-box;
+            /* allow the expanded preview to overflow the card rather than scrolling inside it */
+            overflow: visible;
+            will-change: opacity, transform;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        .cert-card.is-expanded .cert-hover {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+            transition-delay: 0s; /* show immediately when expanded */
+            /* constrain to viewport so the preview doesn't force internal scrolling */
+            max-height: 80vh;
+            padding: 1.5rem;
+            margin-top: 0.5rem;
+            overflow: visible;
+        }
+
+        /* Collapse original card content on hover so expanded section takes full room */
+        /* Fade original content visually but keep layout space to avoid jumps */
+        .cert-card .cert-image,
+        .cert-card .cert-name,
+        .cert-card .cert-desc {
+            transition: opacity 420ms ease, transform 420ms ease;
+            opacity: 1;
+        }
+
+        .cert-card .cert-image img {
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            max-height: 80px;
+        }
+
+        .cert-card.is-expanded .cert-image,
+        .cert-card.is-expanded .cert-name,
+        .cert-card.is-expanded .cert-desc {
+            opacity: 0;
+            transform: translateY(-4px);
+            pointer-events: none;
+        }
+        .cert-hover-img {
+            width: 100%;
+            max-width: 320px;
+            height: auto;
+            max-height: 60vh;
+            object-fit: contain;
+            border-radius: 18px;
+            background: #ffffff;
+            padding: 0.65rem;
+        }
+
+        /* Larger preview for Campfire certificate */
+        .cert-card.cert-campfire .cert-hover-img {
+            width: 320px;
+            height: auto;
+            max-height: 70vh;
+            padding: 0.8rem;
+        }
+
+        /* Campfire expanded preview uses overlay; do not change card height */
+
+        .cert-hover p {
+            margin: 0;
+            font-size: 0.98rem;
+            line-height: 1.6;
+            /* allow paragraphs to use more horizontal space and wrap naturally */
+            max-width: 380px;
+            white-space: normal;
+            overflow: visible;
+            word-break: break-word;
+            color: #f8fafc;
+        }
+
+        /* Smaller Kali image to avoid oversized icon */
+        .cert-card.cert-kali .cert-image img {
+            max-width: 56px;
+            max-height: 56px;
+        }
+
+        .cert-name {
+            font-weight: 600;
+            margin: 0.25rem 0 0.25rem;
+        }
+
+        .cert-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .cert-card { flex: 0 0 180px; }
+            .cert-image { height: 100px; }
+            .cert-image img { max-width: 100px; }
         }
 
         .shape-4 {
@@ -625,7 +869,8 @@
         @keyframes fadeInUp {
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(-4px);
+                pointer-events: none;
             }
         }
 
@@ -1020,7 +1265,10 @@
         .toolbox-image.cachyos {
             background-image: url('images/CachyOS_Logo.svg');
         }
-
+        
+        .toolbox-image.wireshark {
+            background-image: url('images/Wireshark_icon.png');
+        }
         @media (max-width: 1024px) {
             .portfolio-grid,
             .toolbox-grid {
