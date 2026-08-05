@@ -398,6 +398,80 @@
             height: 60px;
             top: 30%;
             right: 25%;
+
+        /* Erfaring (Experience) section */
+        .erfaring {
+            padding: 5rem 0;
+            background: linear-gradient(180deg, rgba(247,248,250,0.6) 0%, rgba(255,255,255,0.95) 100%);
+        }
+
+        .erfaring .section-subtitle {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.98rem;
+        }
+
+        .erfaring-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+
+        .erfaring-item {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            background: var(--bg-card);
+            padding: 1.25rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(15,23,42,0.03);
+        }
+
+        .erfaring-left {
+            min-width: 220px;
+        }
+
+        .erfaring-left .role {
+            font-size: 1.05rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .erfaring-left .company {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .erfaring-right p {
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .erfaring-item.erfaring-template {
+            opacity: 0.7;
+            border-style: dashed;
+        }
+
+        @media (min-width: 768px) {
+            .erfaring-list {
+                grid-template-columns: 1fr;
+            }
+
+            .erfaring-item {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .erfaring-item {
+                flex-direction: column;
+            }
+            .erfaring-left {
+                min-width: auto;
+            }
+        }
             background: rgba(255, 255, 255, 0.12);
             animation: floatShape3 18s ease-in-out infinite;
         }
@@ -696,11 +770,22 @@
             line-height: 1.3;
         }
 
-        .about-text p {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
+        .university-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
             margin-bottom: 2rem;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
             line-height: 1.8;
+        }
+
+        .university-info img {
+            height: 64px;
+            width: auto;
+            border-radius: 10px;
+            box-shadow: var(--shadow-sm);
         }
 
         .skills {
@@ -842,6 +927,112 @@
             text-decoration: none;
             font-weight: 600;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Toolbox Section */
+        .toolbox {
+            padding: 5rem 0;
+            background: linear-gradient(180deg, rgba(248,249,250,0.6) 0%, rgba(255,255,255,0.95) 100%);
+        }
+
+        .toolbox .section-header {
+            text-align: center;
+            max-width: 680px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .toolbox-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 2rem;
+        }
+
+        .toolbox-item {
+            background: var(--bg-card);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.35s ease, box-shadow 0.35s ease;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        .toolbox-item:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .toolbox-image {
+            position: relative;
+            width: 100%;
+            min-height: 180px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-start;
+            padding: 1.5rem;
+        }
+
+        .toolbox-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(15, 23, 42, 0.14) 100%);
+            pointer-events: none;
+        }
+
+        .toolbox-content {
+            padding: 1.75rem;
+        }
+
+        .toolbox-content h4 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .toolbox-content p {
+            color: var(--text-secondary);
+            line-height: 1.75;
+        }
+
+        .toolbox-image.photoshop {
+            background-image: url('images/Adobe_Photoshop_CC_icon.svg');
+        }
+
+        .toolbox-image.premiere {
+            background-image: url('images/Adobe_Premiere_Pro_CC_icon.svg');
+        }
+
+        .toolbox-image.python {
+            background-image: url('images/Python-logo.svg');
+        }
+
+        .toolbox-image.kali {
+            background-image: url('images/Kali-dragon-icon.svg');
+        }
+
+        .toolbox-image.vscode {
+            background-image: url('images/Visual_Studio_Code_1.35_icon.svg');
+        }
+
+        .toolbox-image.cachyos {
+            background-image: url('images/CachyOS_Logo.svg');
+        }
+
+        @media (max-width: 1024px) {
+            .portfolio-grid,
+            .toolbox-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .portfolio-grid,
+            .toolbox-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .portfolio-action-button:hover {
