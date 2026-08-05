@@ -550,18 +550,21 @@
             display: flex;
             flex-direction: row !important;
             gap: 1rem;
-            overflow-x: auto;
+            /* disable scrolling in the certification section; allow wrapping */
+            overflow-x: visible;
             overflow-y: visible;
             padding-bottom: 0.5rem;
-            -webkit-overflow-scrolling: touch;
-            flex-wrap: nowrap;
+            -webkit-overflow-scrolling: initial;
+            flex-wrap: wrap;
             align-items: flex-start;
-            white-space: nowrap;
+            white-space: normal;
         }
 
         .cert-card {
             position: relative;
-            flex: 0 0 200px;
+            /* increase base width so cards remain comfortably sized when wrapping */
+            flex: 0 0 240px;
+            min-width: 200px;
             display: flex;
             flex-direction: column;
             align-items: stretch;
@@ -872,6 +875,61 @@
                 transform: translateY(-4px);
                 pointer-events: none;
             }
+        }
+
+        /* Lightbox styles for full certificate viewing */
+        .lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 240ms ease;
+            z-index: 20000;
+        }
+
+        .lightbox-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .lightbox-content {
+            max-width: calc(100vw - 48px);
+            max-height: calc(100vh - 48px);
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .lightbox-img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            background: #fff;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -14px;
+            right: -14px;
+            background: #111;
+            color: #fff;
+            border: none;
+            border-radius: 32px;
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.4);
         }
 
         /* Scroll Indicator */
@@ -1268,6 +1326,9 @@
         
         .toolbox-image.wireshark {
             background-image: url('images/Wireshark_icon.png');
+        }
+        .toolbox-image.office365 {
+            background-image: url('images/office365logo.png');
         }
         @media (max-width: 1024px) {
             .portfolio-grid,

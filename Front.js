@@ -220,6 +220,15 @@ https://templatemo.com/tm-593-personal-shape
                         const timer = setTimeout(() => { card.classList.remove('is-expanded'); detachFixedOverlay(card, hover); hideTimers.delete(card); }, HIDE_DELAY);
                         hideTimers.set(card, timer);
                     });
+                    // click to open full image preview if available
+                    card.addEventListener('click', (e) => {
+                        // prefer the hover preview img, fall back to main image
+                        const img = card.querySelector('.cert-hover-img') || card.querySelector('.cert-image img');
+                        if (img && img.src) {
+                            openLightbox(img.src, img.alt || card.querySelector('.cert-name')?.textContent || 'Certificate', card);
+                            e.stopPropagation();
+                        }
+                    });
                 });
             }
 
@@ -229,7 +238,8 @@ https://templatemo.com/tm-593-personal-shape
                 // calculate a slightly larger overlay width so text has room (same as Campfire)
                 const padding = 16;
                 const viewportW = window.innerWidth - padding * 2;
-                const desiredWidth = Math.min(420, viewportW);
+                // make overlay match the card width but don't exceed viewport
+                const desiredWidth = Math.min(rect.width, viewportW);
                 // align the overlay's left edge with the card so it reads as an expansion
                 let left = rect.left;
                 left = Math.max(padding, Math.min(left, window.innerWidth - desiredWidth - padding));
@@ -245,29 +255,140 @@ https://templatemo.com/tm-593-personal-shape
                 if (!hover) return;
                 // if already attached, update position
                 positionOverlay(card, hover);
+
+                // measure content height by temporarily allowing auto height
+                const rect = card.getBoundingClientRect();
+                const initialHeight = rect.height;
+
+                // prepare overlay for measurement
+                const prevVisibility = hover.style.visibility;
+                const prevHeight = hover.style.height;
+                const prevMaxHeight = hover.style.maxHeight;
+
+                hover.style.height = 'auto';
+                hover.style.visibility = 'hidden';
+                hover.style.maxHeight = '';
+                // ensure width is set for accurate scrollHeight measurement
+                const desiredWidth = hover.style.width || rect.width + 'px';
+                hover.style.width = desiredWidth;
+                const contentHeight = Math.min(hover.scrollHeight + 24, window.innerHeight * 0.8);
+
+                // restore measurement state and set initial collapsed state
+                hover.style.visibility = prevVisibility || '';
+                hover.style.height = initialHeight + 'px';
+                hover.style.maxHeight = contentHeight + 'px';
+
+                // set up transition
+                hover.style.transition = 'height 420ms cubic-bezier(.2,.9,.2,1), opacity 420ms cubic-bezier(.2,.9,.2,1), transform 420ms cubic-bezier(.2,.9,.2,1)';
+                hover.style.transformOrigin = 'top left';
+                hover.style.opacity = '0';
+                hover.style.transform = 'translateY(6px) scale(0.995)';
+
+                // force reflow then expand to measured content height
+                // store data for cleanup
                 const onUpdate = () => positionOverlay(card, hover);
                 window.addEventListener('resize', onUpdate);
                 window.addEventListener('scroll', onUpdate, { passive: true });
-                overlayListeners.set(card, onUpdate);
+
+                const data = { onUpdate, initialHeight, contentHeight, prevStyles: { height: prevHeight, visibility: prevVisibility, maxHeight: prevMaxHeight } };
+                overlayListeners.set(card, data);
+
+                // start animation on next frame
+                requestAnimationFrame(() => {
+                    hover.style.height = data.contentHeight + 'px';
+                    hover.style.opacity = '1';
+                    hover.style.transform = 'translateY(0) scale(1)';
+                });
             }
 
             function detachFixedOverlay(card, hover) {
                 if (!hover) return;
-                const l = overlayListeners.get(card);
-                if (l) {
-                    window.removeEventListener('resize', l);
-                    window.removeEventListener('scroll', l, { passive: true });
+                const data = overlayListeners.get(card);
+                if (data && data.onUpdate) {
+                    window.removeEventListener('resize', data.onUpdate);
+                    window.removeEventListener('scroll', data.onUpdate, { passive: true });
                     overlayListeners.delete(card);
                 }
-                // restore to absolute so stylesheet rules apply when not expanded
-                hover.style.position = '';
-                hover.style.left = '';
-                hover.style.top = '';
-                hover.style.width = '';
-                hover.style.zIndex = '';
+
+                // animate collapse back to card height
+                const collapseTo = (data && data.initialHeight) ? data.initialHeight : (card.getBoundingClientRect().height || 180);
+                // ensure transition is set
+                hover.style.transition = hover.style.transition || 'height 320ms cubic-bezier(.2,.9,.2,1), opacity 320ms cubic-bezier(.2,.9,.2,1), transform 320ms cubic-bezier(.2,.9,.2,1)';
+                hover.style.height = collapseTo + 'px';
+                hover.style.opacity = '0';
+                hover.style.transform = 'translateY(6px) scale(0.995)';
+
+                // after transition ends, cleanup inline styles so CSS rules take over
+                const cleanup = (e) => {
+                    if (e && e.target !== hover) return;
+                    hover.removeEventListener('transitionend', cleanup);
+                    hover.style.position = '';
+                    hover.style.left = '';
+                    hover.style.top = '';
+                    hover.style.width = '';
+                    hover.style.zIndex = '';
+                    hover.style.height = '';
+                    hover.style.maxHeight = '';
+                    hover.style.transition = '';
+                    hover.style.opacity = '';
+                    hover.style.transform = '';
+                    hover.style.transformOrigin = '';
+                };
+
+                hover.addEventListener('transitionend', cleanup);
             }
 
             // Attach immediately and also when DOM is ready (covers timing edge cases)
+            // Lightbox for viewing full certificate images
+            let lightbox;
+            function createLightbox() {
+                if (lightbox) return lightbox;
+                const overlay = document.createElement('div');
+                overlay.className = 'lightbox-overlay';
+                overlay.innerHTML = `
+                    <div class="lightbox-content">
+                        <button class="lightbox-close" aria-label="Close">✕</button>
+                        <img class="lightbox-img" src="" alt="Certificate preview">
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+                const img = overlay.querySelector('.lightbox-img');
+                const close = overlay.querySelector('.lightbox-close');
+                overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target === close) closeLightbox(); });
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+                lightbox = { overlay, img };
+                return lightbox;
+            }
+
+            function openLightbox(src, alt, card) {
+                const lb = createLightbox();
+                lb.img.src = src;
+                lb.img.alt = alt || 'Certificate preview';
+                // allow the lightbox image to be larger than the card (up to viewport)
+                try {
+                    const rect = card ? card.getBoundingClientRect() : null;
+                    const padding = 48; // safety margin
+                    const viewportW = window.innerWidth - padding;
+                    // prefer up to 1.5x card width, but at least 360px and never exceed viewport
+                    const desired = rect ? Math.min(Math.max(rect.width * 1.5, 360), viewportW) : Math.min(900, viewportW);
+                    lb.img.style.maxWidth = desired + 'px';
+                    lb.img.style.maxHeight = 'calc(100vh - 48px)';
+                    lb.img.style.width = 'auto';
+                    lb.img.style.objectFit = 'contain';
+                } catch (e) {
+                    lb.img.style.maxWidth = '90vw';
+                    lb.img.style.maxHeight = 'calc(100vh - 48px)';
+                }
+                lb.overlay.classList.add('open');
+            }
+
+            function closeLightbox() {
+                if (!lightbox) return;
+                lightbox.overlay.classList.remove('open');
+                // clear src after transition to free memory
+                setTimeout(() => { if (lightbox && lightbox.img) lightbox.img.src = ''; }, 300);
+            }
+
             attachHandlers();
             document.addEventListener('DOMContentLoaded', attachHandlers);
         })();
