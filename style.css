@@ -1316,6 +1316,14 @@
             background-image: url('images/Kali-dragon-icon.svg');
         }
 
+        .toolbox-image.metasplot {
+            background-image: url('images/metasploitlogo.png');
+        }
+
+        .toolbox-image.nmap {
+            background-image: url('images/nmaplogo.jpeg');
+        }
+
         .toolbox-image.vscode {
             background-image: url('images/Visual_Studio_Code_1.35_icon.svg');
         }
